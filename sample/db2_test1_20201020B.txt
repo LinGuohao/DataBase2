@@ -1,0 +1,224 @@
+Databases II. Midterm test, 2020.10.20. 16.15
+Name: ARBAB ALI
+Neptun code: D1CPLD
+
+Solutions should be written into this file and sent to the following email address:
+nikovits@inf.elte.hu
+
+Minimal requirement from "paper" exercises: 8 points
+Minimal requirement from computer exercises: 8 points
+Grade levels will be the following: 
+   24 points (2), 33 points (3), 42 points (4), 51 points (5)
+
+"Paper" exercises
+========================================================================
+1. (6 points)
+Insert the following keys (in the given order) into the B+ tree below: 52, 19, 90 
+Let's suppose that a node (block) can contain 3 keys and 4 pointers.
+Redraw the tree after each split.
+
+                           72
+                43|56                79
+  15|39|40   43|45|49   56|70    72|75   79|80|83 
+------------------------------------------------------------------------
+Solution:
+Insert 52
+                           72
+              43|49|56              79
+  15|39|40   43|45	49|52   56|70    72|75   79|80|83 
+
+Insert 19
+                           49|72
+              39|43|	   56               79
+  15|19	   39|40  43|45	49|52  56|70  72|75    79|80|83 
+  
+Insert 90
+                   49|72
+              39|43|	             56               79
+  15|19	   39|40    43|45	49|52  56|70     72|75    79|80|83 
+========================================================================
+2. (6 points)
+a) Compress the following bit vector with run-length encoding:
+ 10000000000000001100000000001
+b) Decompress the following run-length encoded bit vector:
+   111011011010110101
+
+------------------------------------------------------------------------
+Solution:
+a) 10000000000000001100000000001
+run lengths: 0, 15, 0,  10 -> in binary 0, 1111, 0, 1010 
+compressed -> 00 11101111  00  11101010
+               -     ----   -      ----
+               0       15   0        10
+
+b)     111011011010110101
+	   ----  --   ---
+	     13   2     5
+decompressed -> 00000000000001001000001
+========================================================================
+3. (8 points)
+There is a Linear hash table below. We can put two records into a block,
+n = 4 (current number of buckets); i = 2 (number of bits used);
+r/n = 2.9 (predefined threshold, where r is the actual number of records)
+
+0100          0010  
+----          ----
+1100   0101   1010   1011
+0000   1101   1110   0011 
+----   ----   ----   ----
+ 00     01     10     11
+
+Insert the following values into the hash table: 0111, 1000, 1111, 0110
+Redraw the diagram when you create a new bucket.
+------------------------------------------------------------------------
+Solution:
+Inserting 0111
+
+0100          0010   0111
+----          ----   ----
+1100   0101   1010   1011
+0000   1101   1110   0011 
+----   ----   ----   ----
+ 00     01     10     11
+
+Inserting 1000
+
+              0010   0111
+----          ----   ----
+1000   0101   1010   1011   1100
+0000   1101   1110   0011   0100
+----   ----   ----   ----   ----
+ 000    001    010    011    100
+Inserting 1111
+		     1111
+              0010   0111
+----          ----   ----
+1000   0101   1010   1011   1100
+0000   1101   1110   0011   0100
+----   ----   ----   ----   ----
+ 000    001    010    011    100
+Inserting 0110
+	      0110   1111
+              0010   0111
+----          ----   ----
+1000   0101   1010   1011   1100
+0000   1101   1110   0011   0100
+----   ----   ----   ----   ----
+ 000    001    010    011    100
+========================================================================
+4. (10 points)
+Let's consider a relation R with the following parameters:
+T(R)=1600000, block size = 8192 bytes, L(R)=256 bytes, V(R,A)=500, and let W the result
+of the following query: W <-- SELECT c1,c2 FROM R WHERE A='x';
+a) Compute B(W) if L(W)=64 bytes.
+b) What is the cost (in block I/O) of a sort operation on R, if the memory size is 101 blocks?
+
+------------------------------------------------------------------------
+Solution:
+a)
+bf(R) = 32
+bf(W)  = 128
+T(W) = 3200
+B(R)  = 1600000/32 = 50000
+B(W) =  3200/128    = 25
+
+b)
+-> 2*B(R) + 2*B(R)*log[B(R)/M] - B(R)  (base of logarithm is M-1)
+========================================================================
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+========================================================================
+Computer exercises in SQL and PL/SQL. 
+You should send your queries and programs as well as the output!!!
+You can work either in Aramis or Ullman database.
+------------------------------------------------------------------------
+5. (10 points)
+Give the name and size of the Hash clusters whose owner is ’NIKOVITS’ (Cluster_name, Size)
+------------------------------------------------------------------------
+Solution:
+SELECT distinct segment_name as Cluster_name , sum(bytes) as  sizeOFHASH    FROM dba_segments
+WHERE segment_name in (SELECT cluster_name FROM dba_clusters WHERE owner='NIKOVITS' and cluster_type='HASH')
+GROUP BY segment_name;
+
+CKOD_HASH	589824
+CIKK_HCL	1507328
+CIKK_HCL3	983040
+CIKK_HCL2	983040
+========================================================================
+6. (10 points)
+Write a PL/SQL function which returns in a character string the list of table names 
+(comma separated list in alphabetical order) of owner NIKOVITS, where the table has a NUMBER data type column,
+and the table has datablocks in two different datafiles.
+
+CREATE OR REPLACE FUNCTION nt_tabs RETURN VARCHAR2 IS
+...
+SELECT nt_tabs() from dual;
+
+You can check your program with the following:
+set serveroutput on
+EXECUTE check_plsql('nt_tabs()');
+------------------------------------------------------------------------
+Solution:
+CREATE OR REPLACE FUNCTION nt_tabs RETURN VARCHAR2 IS
+    tt varchar2(200);
+    CURSOR MYCUR IS 
+    SELECT segment_name FROM dba_extents WHERE owner='NIKOVITS' AND segment_name in (select TABLE_NAME from dba_tab_columns where data_TYPE='NUMBER' and owner='NIKOVITS')
+    GROUP BY segment_name HAVING count(distinct file_id) > 1;
+    rec MYCUR%ROWTYPE;
+begin
+    OPEN MYCUR;
+    LOOP
+        FETCH MYCUR INTO rec;
+        EXIT WHEN MYCUR%NOTFOUND;
+        dbms_output.put_line(rec.segment_name||',');
+    END LOOP;
+    CLOSE MYCUR;
+    return substr(tt, 0, length(tt)-2);
+end;
+/
+CIKK_HCL,
+EMP1,
+CUSTOMERS,
+ELADASOK3,
+TABLA_123,
+PLAN_TABLE,
+SZALLIT,
+HIVAS_V2,
+ELADASOK4,
+HIVAS,
+SUPPLY,
+ELADASOK,
+CIKK_HCL2,
+CKOD_CL,
+ELADASOK5,
+ELADASOK2,
+D1CPLD.NT_TABS ---> output of the program is WRONG.
+========================================================================
+7. (10 points)
+Write a PL/SQL procedure which prints out the average blocking factor
+[(number of rows)/(number of non-empty blocks)] of table NIKOVITS.CUSTOMERS.
+
+CREATE OR REPLACE PROCEDURE bl_factor IS
+...
+set serveroutput on
+EXECUTE bl_factor();
+
+You can check your program with the following:
+EXECUTE check_plsql('bl_factor()');
+------------------------------------------------------------------------
+Solution:
+
+CREATE OR REPLACE PROCEDURE bl_factor IS
+  n_emp number; n_blocks number; n_rows number;
+BEGIN
+  SELECT count(DISTINCT substr(ROWID,1,15)) INTO n_emp FROM nikovits.customers;
+  SELECT blocks INTO n_blocks FROM dba_segments WHERE owner='NIKOVITS' 
+  AND segment_name='CUSTOMERS' AND segment_type='TABLE';
+  SELECT count(*) INTO n_rows FROM nikovits.customers; 
+  dbms_output.put_line(round(n_rows/n_emp,1));
+END;
+/
+
+--output
+38.2
+
+========================================================================

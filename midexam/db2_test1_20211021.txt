@@ -1,0 +1,237 @@
+Databases II. Midterm test, 2021.10.21. 12.15
+Name: Guohao Lin
+Neptun code: IW3XV9
+
+Solutions should be written into this file and sent to the following email address:
+nikovits@inf.elte.hu
+
+Minimal requirement from "paper" exercises: 8 points
+Minimal requirement from computer exercises: 8 points
+Grade levels will be the following: 
+   24 points (2), 33 points (3), 42 points (4), 51 points (5)
+
+"Paper" exercises
+========================================================================
+1. (6 points)
+Insert the following keys (in the given order) into the B+ tree below: 52, 19, 90 
+Let's suppose that a node (block) can contain 3 keys and 4 pointers.
+Redraw the tree after each split.
+
+                           73
+                43|56                 79
+  15|39|40   43|45|49   56|70    73|75   79|80|83 
+------------------------------------------------------------------------
+Solution:
+
+Insert 52
+                                     73
+                43|49|56                      79
+  15|39|40   43|45   49|52  56|70  73|75   79|80|83 
+
+Insert 19
+                                     49|73
+                39|43               56                      79
+  15|19   39|40   43|45  49|52  56|70   73|75     79|80|83 	
+
+Insert 90
+                                      49|73
+                39|43               56                        79|83
+  15|19   39|40   43|45  49|52  56|70   73|75     79|80   83|90 
+========================================================================
+2. (6 points)
+a) Compress the following bit vector with run-length encoding:
+   100000000000000010100000000001
+
+b) Decompress the following run-length encoded bit vector:
+   111010111010110101
+------------------------------------------------------------------------
+Solution:
+a)
+      0 zeros -> binary form: 0
+    15 zeros -> binary form: 1111
+      1 zero   -> binary form : 1
+    10 zeros -> binary form : 1010
+compressed result : 00111011110111101010
+
+b)
+    1011  -> decimal form: 11
+     10     -> decimal form:  2
+     101   -> decimal form  5
+decompressed result: 000000000001001000001
+========================================================================
+3. (8 points)
+There is a Linear hash table below. We can put two records into a block,
+n = 4 (current number of buckets); i = 2 (number of bits used);
+r/n = 2.9 (predefined threshold, where r is the actual number of records)
+
+0100               0010  
+----                 ----
+1100   0101   1010   1011
+0000   1101   1110   0011 
+----     ----      ----     ----
+ 00       01       10        11
+
+Insert the following values into the hash table: 0111, 1000, 1111, 0110
+Redraw the diagram when you create a new bucket.
+------------------------------------------------------------------------
+Solution:
+
+Insert 0111
+
+
+0100               0010   0111
+----                 ----     -----
+1100   0101   1010   1011
+0000   1101   1110   0011 
+----     ----      ----     ----
+ 00       01       10        11
+
+
+
+
+Insert 1000
+
+
+	     0010   0111
+                     -----   ----
+1000   0101  1010   1011  0100
+0000   1101  1110   0011  1100
+----     -----    ----    ----    -----
+000     001     010     011    100
+
+
+Insert 1111
+
+
+                               1111
+	     0010   0111
+                     -----   ----
+0000   0101  1010   1011  0100
+1000   1101  1110   0011  1100
+----     -----    ----    ----    -----
+000     001     010     011    100
+
+
+Insert 0110
+
+
+
+                     0110   1111
+	     0010   0111
+                     -----   ----
+0000   0101  1010   1011  0100
+1000   1101  1110   0011  1100
+----     -----    ----    ----    -----
+000     001     010     011    100
+
+========================================================================
+4. (10 points)
+Let's consider a relation R with the following parameters:
+T(R)=1600000, block size = 8192 bytes, L(R)=256 bytes, V(R,A)=500, and let W the result
+of the following query: W <-- SELECT c1,c2 FROM R WHERE A='x';
+a) Compute B(W) if L(W)=64 bytes.
+b) What is the cost (in block I/O) of a sort operation on R, if the memory size is 101 blocks?
+
+------------------------------------------------------------------------
+Solution:
+a) 
+   bf(W)  = 8192/64 = 128
+   T(W)    =  T(R) / V(R,A) = 1600000/500 = 3200
+   B(W)    = T(W) / bf(W) =  3200/128 = 25
+b)
+    2*B(R) + 2*B(R)*log[B(R)/M] - B(R)  (base of logarithm is M-1)
+   bf(R)  = 8192/256 = 32 
+   B(R) = T(R)/bf(R) =  1600000/32 = 50000
+   so the cost will be  2*50000 + 2*50000*log[50000/101] - 50000 =~ 100000 + 2* 50000 * 1.34 - 50000 = 184000
+
+
+
+========================================================================
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+========================================================================
+Computer exercises in SQL and PL/SQL. 
+You should send your queries and programs as well as the output!!!
+You can work either in Aramis or Ullman database.
+------------------------------------------------------------------------
+5. (10 points)
+Give the name and size of the Hash clusters whose owner is ’NIKOVITS?(Cluster_name, Size)
+------------------------------------------------------------------------
+Solution:
+
+select cluster_name ,bytes from dba_CLUSTERS c,dba_segments s where cluster_name = segment_name and c.owner = s.owner and 
+c.owner = 'NIKOVITS' and cluster_type = 'HASH';
+
+output:
+
+CLUSTER_NAME      BYTES
+CIKK_HCL	                589824
+CIKK_HCL2	327680
+CIKK_HCL3	327680
+========================================================================
+6. (10 points)
+Write a PL/SQL function which returns in a character string the list of table names 
+(comma separated list in alphabetical order) of owner NIKOVITS, where the table has a NUMBER data type column,
+and the table has datablocks in two different datafiles.
+
+CREATE OR REPLACE FUNCTION nt_tabs RETURN VARCHAR2 IS
+...
+SELECT nt_tabs() from dual;
+
+You can check your program with the following:
+set serveroutput on
+EXECUTE check_plsql('nt_tabs()');
+------------------------------------------------------------------------
+CREATE OR REPLACE FUNCTION nt_tabs RETURN varchar2 IS
+ tablename varchar(200);
+ n integer;
+ tmp integer;
+ nt integer :=0;
+begin
+    for i in (select distinct segment_name from dba_extents where owner = 'NIKOVITS' and segment_type = 'TABLE' order by segment_name) loop
+        select count(*) into tmp from dba_tab_columns where owner = 'NIKOVITS' and table_name = i.segment_name and data_type = 'NUMBER';   
+        if(tmp > 0) then
+             select count(*) into n from (select distinct file_id from dba_extents where  owner = 'NIKOVITS' and segment_type = 'TABLE' and segment_name = i.segment_name);
+             if(n =2) then
+                tablename := tablename || i.segment_name||',';
+             end if;
+        end if;
+    end loop;
+    return substr(tablename,0,length(tablename)-1);
+end ;
+/
+
+
+output:CUSTOMERS,HIVAS_V2,PLAN_TABLE,TABLA_123,TEST2
+
+
+========================================================================
+7. (10 points)
+Write a PL/SQL procedure which prints out the data blocks of table NIKOVITS.CUSTOMERS
+in which the number of records is 35. The output has 3 columns: File_id, Block_number
+and the number of records within that block. Columns are separeted by semicolons --> 2;697;35;...
+
+CREATE OR REPLACE PROCEDURE equal_35 IS
+...
+set serveroutput on
+EXECUTE equal_35();
+
+You can check your program with the following:
+
+
+------------------------------------------------------------------------
+Solution:
+CREATE OR REPLACE PROCEDURE equal_35 IS
+begin
+    for i in (select file_no, block_no , count(*) n from (select dbms_rowid.rowid_relative_fno(ROWID) file_no, dbms_rowid.rowid_block_number(ROWID) block_no  from NIKOVITS.CUSTOMERS) group by file_no, block_no having count(*) = 35 order by block_no) loop
+        dbms_output.put_line(i.file_no||';'||i.block_no||';'||i.n||';');
+    end loop;
+end;
+/
+EXECUTE check_plsql('equal_35()');
+
+
+output 
+2;697;35;
+2;1195;35;
+2;1740;35;
+========================================================================

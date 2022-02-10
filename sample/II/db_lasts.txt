@@ -1,0 +1,53 @@
+**What is the cost of selection operation (SELECT * FROM R WHERE A = 'x') if we use l, a non-unique B+ tree clustered index?
+T(R) = 100000, V(R,A) = 1000, HT(I)=5, bf(R) = 100**
+Single record: HT(I) + 1 = 6
+Multiple:
+SC(R,A) = T(R)/V(R,A)
+HT(I) + ceil (SC(R,A)/bf(R))
+
+
+**What is the average cost of a selection operation (SELECT * FROM R WHERE A='x') if we use I, a B+ tree
+primary index? We know the following parameters: T(R)=100000, V(R,A)=100000, HT(I)=5.**
+Cardinality is one
+Single record: HT(I) + 1
+Multiple:
+SC(R,A) = T(R)/V(R,A)
+bf(R) = ?
+HT(I) + ceil (SC(R,A)/bf(R))
+
+**What is the cost of a Nested Loop join algorithm if we know the following parameters:
+B(R)=1000, B(S)=10000, M=1200 ?**
+B(R) + B(S) because 1000 fits into memory
+
+**What is the cost of the improved Block Nested Loop join algorithm if we know the following
+parameters: B(R)=1000, B(S)=2000, M=101.**
+B(R)/(M-1) * B(S) + B(R) = 2000
+
+**How many different join trees are there if we join 3 relations R,S,T?**
+3!*2
+
+*What is the cost of the external Sort-Merge algorithm if we know the following parameters:
+B(R)=1000000, M=101?*
+2 * B(R) + 2*B(R) * | log_base(M-1)(B(R)/M)| - B(R) =>  (around) = 500000
+
+What is the cost of a Hash join, if we know the following parameters?B(R)=1000, B(S)=1500, M=100
+2*(B(R) + B(S)) + (B(R) + B(S)) = 7500
+
+Give estimation for B(RxS), if we know the following parameters: T(R)=1000, T(S)=2000, bf(R)=100, bf(S)=50.
+B(RxS) = T(R)*T(S)/bf(W) = T(R)*T(S)*L(S)/b + T(S)*T(R)*L(R)/b =
+= T(R)*T(S)/bf(S) + T(S)*T(R)/bf(R)
+
+Give estimation for the number of rows of a join operation (R natural join S) ifwe assume the "containment of value sets"
+and know the following parameters: T(R)=1000,T(S)=2000, V(R,A)=100, V(S,A)=200.
+T(W) = T(R)*T(S)/max{V(R,A), V(S,A)}
+
+**Give estimation for T(W) if W is the result of the following query:
+SELECT * FROM R WHERE A=1 AND B=2;
+and we know the following parameters: T(R) = 100000, V(R,A) = 100, V(R,B) = 200.**
+T(W) = (T(R)/V(R,A))/V(R,B)
+
+**Give estimation for the number of rows of a join operation (R natural join S) if they
+have a common attribute A, A is key in R, A is foreign key in S, and we know the following parameters: T(R)=1000, T(S)=2000.**
+T(S)
+
+========================

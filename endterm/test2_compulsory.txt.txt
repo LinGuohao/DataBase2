@@ -1,0 +1,79 @@
+CREATE OR REPLACE PROCEDURE print_histogram(p_owner VARCHAR, p_table VARCHAR, p_col VARCHAR) IS
+    v_sql varchar(300):='select '||p_col||', count(*) val , length('||p_col||') len from '||p_owner||'.'||p_table|| 
+    ' where '||p_col||' is not null group by '||p_col||' order by '||p_col;
+    v_max_len integer:=0;
+    tmplen integer;
+    tmpcol varchar(100);
+    tmpval varchar(100);
+    TYPE cursor_type IS REF CURSOR;
+    c1 cursor_type; 
+    numofcol integer :=0;
+    toolong EXCEPTION;
+    minval integer:=200;
+    res varchar(1000);
+BEGIN
+    open c1 for v_sql ;  
+    LOOP
+        FETCH c1 INTO tmpcol,tmpval,tmplen;
+        numofcol := numofcol + 1;
+        if (tmplen > v_max_len) then
+            v_max_len := tmplen;
+        end if;
+        
+        if(tmpval < minval) then
+            minval := tmpval;
+        end if;
+        EXIT WHEN c1%NOTFOUND;
+  END LOOP;
+  close c1;  
+  if (numofcol > 100 or numofcol = 0) then
+    raise toolong;
+  end if;
+    
+    open c1 for v_sql ;  
+    LOOP
+        FETCH c1 INTO tmpcol,tmpval,tmplen;
+        res := '';
+        dbms_output.put(rpad(tmpcol, v_max_len)||' --> ');
+        
+        for i in 1..(tmpval/minval) loop
+            res := res || '*';
+        end loop;
+        dbms_output.put_line(res);
+
+        EXIT WHEN c1%NOTFOUND;
+  END LOOP;
+  close c1;  
+
+EXCEPTION
+    when toolong then
+        dbms_output.put_line('Few or too many distinct values in column');
+    when others then
+        dbms_output.put_line('Non-existing table or column');
+END;
+/
+
+1968 --> *******************************
+1969 --> *******************************
+1970 --> ******************************
+1971 --> ******************************
+1972 --> *****************************
+1973 --> *****************************
+1974 --> ******************************
+1975 --> *******************************
+1976 --> ******************************
+1977 --> ******************************
+1978 --> ******************************
+1979 --> ******************************
+1980 --> *****************************
+1981 --> ****************************
+1982 --> ************************
+1983 --> ***********************
+1984 --> ******************
+1985 --> ************
+1986 --> *********
+1987 --> *****
+1988 --> ***
+1989 --> **
+1990 --> *
+1990 --> *

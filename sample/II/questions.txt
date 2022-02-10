@@ -1,0 +1,445 @@
+1) Give the most important memory structures of an Oracle instance. (01_Oracle_architecture.pptx 5.)
+
+     - we have the System glpal area which is alocated when instance starts
+     which has the database buffer cache , the redo log buffer and shared data part
+     we have a private memory area which serves the Client processes
+     and the Disk where we have the database files, control files and some other log files
+
+2) What are the most important files (file types) in an Oracle database? (01_Oracle_storage.pptx 1.)
+
+    - Control files
+    - Data files
+    - Online redo log files
+    - parameter file
+    - backup files
+    - alert and trace log files
+    - archive log files
+    - password file
+
+3) Give the most important processes of an Oracle instance. (01_Oracle_architecture.pptx 5.)
+
+    - if we have a client process which connects to the database
+    and for example gives a sql statement, and then we need the server processes that
+    will serve the client, and tries to prepare the statement,
+    The system will store the special information in the private memory area
+    then the server processes will read the datablocks and load them in the buffer,
+    and then give it to the client process...
+    
+    - in other case when we want to update a record the system will create a log first
+    and wil save it in the memory and then write it to the log files (LGWR)
+    and then the system updates the log from the buffer memory to the data files (DBWn)
+    (shouldnt happen often as its an expensive process)
+
+    - we also have : Database writer checkpoints (CKPT), log writer (LGWR), 
+    also (ARCn) to archive log files (as it will be overriden)
+
+
+
+4) List 5 data dictionary views in an Oracle database.
+
+    - user_tables, all_sequences, dba_users, dba_indexes, DBA_views, ALL_views ...
+
+5) List 10 different schema objects in an Oracle database.
+
+    - tables, views, sequences, synonyms, indexes, clusters, triggers, database links, Stored functions, procedures, and packages,
+
+
+
+6) List 5 different objects in an Oracle database which are not in a user’s schema.
+
+        - Contexts, Directories, User, Tablespaces and Profile
+
+7) What is a sequence in an Oracle database? Give SQL examples for the creation and usage. (01_Oracle_architecture.pptx 15-17.)
+
+    - A sequence is a mechanism for automatically generating integers that follow a pattern.
+
+    create: CREATE SEQUENCE seq1 
+            MINVALUE 1 MAXVALUE 100 INCREMENT BY 5 
+            START WITH 50 CYCLE;
+    usage:
+        Next value from sequence:
+        INSERT INTO dept VALUES(seq1.NEXTVAL, 'IT', 'Budapest'); 
+
+8) Give the data storage concepts (segment, extent etc.) in an Oracle database, and draw the relationships among them. (01_Oracle_storage.pptx 8.)
+
+        - An extent is a set of logically contiguous data blocks 
+        allocated for storing a specific type of information. 
+
+        - A segment is a set of extents allocated for a specific database object, such as a table.
+
+        - we have the datafiles and when we create a table, it has one segment usually (index as well)
+        and the segments are stored in the datafile, in some cases large tables will have data
+        in two datafiles, Views and sequesnces doesnt need storage
+
+
+
+9) Describe RAID level 0, 1, 2, 3, 4, 5, 6 technology. (02_RAID.docx)
+
+    - RAID 0 (block level striping, no parity bits, no mirroring)
+        splits data evenly across two or more disks,without parity information, redundancy, or fault tolerance
+
+    - RAID 1 (mirroring, no parity bits, no striping)
+        make an exact copy of a set of data on two or more disks
+
+    - RAID 2 (bit level striping, error correcting parity bits)
+        stripes data at the bit level, and uses a Hamming code for error correction.
+
+    - RAID 3 (byte level striping, dedicated parity disk)
+        consists of byte-level striping with a dedicated parity disk
+
+    - RAID 4 (block level striping, dedicated parity disk)
+        consists of block-level striping with a dedicated parity disk
+
+    - RAID 5 (block level striping, distributed parity)
+        consists of block-level striping with distributed parity.
+
+    - RAID 6 (block level striping, double parity bits, distributed parity disks)
+        extends RAID 5 by adding another parity block; 
+        thus, it uses block-level striping with two parity blocks distributed across all member disks
+
+
+10) What does it mean: spanned vs unspanned record? Draw example data blocks for both. (02_UW_file_structure 27-29.)
+
+    - spanned: records are stored using multiple blocks
+    and uses pointers to indicate partial records to the rest and for continuation
+    and it's essential if record size > block size
+
+
+    - unspanned: records must be within one block and is much simpler, 
+    but may waste space as a record is stored inside the block only 
+    if it can be stored completely inside it
+
+
+
+11) Give 3 sequencing options for records. (02_UW_file_structure 31-33.)
+
+    - Next record physically contiguous
+    - Linked
+    - Overflow are
+
+
+12) What is the difference between a purely physical and a fully indirect record reference? (02_UW_file_structure 35-37.)
+
+    - the physical refere to the physical place of the record 
+    indirect uses map where we store some ID and the physical address
+
+
+13) Describe the difference between row store and column store. Give example records for both. (02_UW_file_structure 55-58.)
+
+    - Column Store
+            more compact storage (fields need not start at byte boundaries)
+            efficient reads on data mining operations
+
+    - Row Store
+            writes (multiple fields of one record)more efficient
+            efficient reads for record access (OLTP)
+
+14) What is the difference between a sparse index and a dense index? (03_UW_indexing 5.)
+
+    - dense index (needed for secondary indexes)
+        has an index entry for every search key value (usually every record) in the data file.
+        so Can tell if any record exists without accessing file
+
+    - sparse index (better for insertions)
+        has index entries for only some of the search values
+        so Less index space per record and can keep more of index in memory
+
+15) What is the difference between a primary index and secondary index? (03_UW_indexing 12.)
+
+    - primary index: is created when the datafile is ordered and index is created in same filed where ordered is based
+        we can create one primary index as the datafile should be sequenced
+
+    - secondary index: created on other fields which are not ordered
+
+16) What is a clustering index? (03_UW_indexing.ppt 49.)
+
+    - Defined on an ordered data file 
+    is a type of index which sorts the data rows in the table on a non-key field.
+    It is an example of non-dense index 
+    where Insertion and Deletion is relatively straightforward with a clustering index.
+
+17) Insert the following keys into a given B+ tree ... ---------------------------------------
+
+18) What is the difference between a B-tree and a B+ tree? (03_UW_indexing 88.)
+
+    - The difference in B+ tree and B tree is that in B tree the keys 
+    and records can be stored as internal as well as leaf nodes whereas in B+ trees, 
+    the records are stored as leaf nodes and the keys are stored only in internal nodes.
+    so we Have record pointers in non-leaf nodes in B+ trees and we can avoid duplicates
+
+
+19) What is a bitmap index? What are there in the leaf nodes? (04_Bitmap_indexes)
+
+    - its another kind of index that uses bitmaps 
+    bitmap index is also organized as a B-tree, 
+    but the leaf node stores a bitmap for each key value instead of a list of ROWIDs.
+
+
+
+20) Compress the following bitvector with run-length encoding ... ----------------------------
+21) Decompress the following compressed bitvector ... ----------------------------
+
+22) What is dynamic hashing? (04_UW_hashing 18.)
+
+    - a mechanism in which data buckets are added and removed dynamically and on-demand.
+
+23) Build a linear hash structure from the following key values ...-------------------
+24) Build an extensible hash structure from the following key values ...------------------
+
+25) What is the most important cost factor in query execution? (05_optimization 9.)
+
+    - number of disk I/O operations
+
+26) Give the meaning of the following notations that we use in cost estimation: T(R), B(R), bf(R), V(R,A), SC(R,A). (05_optimization 10.)
+
+
+    T(R): number of records in R
+    B(R): number of pages to store relation R
+    bf(R): blocking factor
+    V(R,A): number of distinct values of attribute A in R
+    SC(R,A): selection cardinality of A in R (number of matching rec.)
+
+
+27) What is the average cost of a selection operation (A=xR) if we use a clustered B+ tree index?
+in case of single record/multiple record (05_optimization 12.)
+
+    - single record: single record: HTi + 1
+    - multi record: HTi + ceil( SC(R,A)/bf(R) )
+
+
+28) What is the average cost of a selection operation (A=xR) if we use a secondary B+ tree index? 
+in case of key field/nonkey filed (05_optimization 13.)
+
+    - key field: HTi + 1
+    - non-key field:  worst case HTi + SC(A,R)
+
+29) Describe the external Sort-Merge algorithm. What is the cost of it? (05_optimization 21.)
+
+    it consits of Two stages (sortingand then merging sorted stuff):
+
+    -Sort stage: create sorted runs
+
+            i=0;
+            repeat
+                read M pages of relation R into memory (M: size of Memory)
+                sort the M pages
+                write them into file Ri
+                increment i
+            until no more pages
+            N = i	// number of runs
+
+
+    -Merge stage: merge sorted runs
+
+        //assuming N < M (N <= M-1 we need 1 output buffer)
+        allocate a page for each run file Ri	// N pages allocated
+        read a page Pi of each Ri 
+        repeat
+            choose first record (in sort order) among N pages, say from page Pj
+            write record to output and delete from page Pj
+            if page is empty read next page Pj’ from Rj
+        until all pages are empty
+
+
+    - Cost: 2 x B(R) + 2 x B(R) x |log(M-1)(B(R)/M)| - B(R)
+
+
+30) What is the cost of a Nested Loop join algorithm? (best case/worst case) (05_optimization 25.)
+
+
+    - best case (use it as inner relation) : B(R) + B(s)
+    - worst case (S scanned for each tuple in R) : T(R) x B(S) + B(R)
+
+31) What is the cost of a Block Nested Loop join algorithm? (best case/worst case) (05_optimization 27.)
+
+
+    - best case (use it as inner relation) : B(R) + B(s)
+    - worst case (S scanned for each tuple in R) : B(S) x B(R) + B(s)
+
+
+32) What is the cost of the improved Block Nested Loop join algorithm? (05_optimization 29.)
+
+
+    - best case (use it as inner relation) : B(R) + B(s)
+    - worst case (for each M-1 size chunk in R) : (B(R) / (M-1)) x B(S) + B(R)
+
+
+33) Describe the Indexed Nested Loop join algorithm? What is the cost of it? (05_optimization 30.)
+
+    - the algorithm is simple
+
+        Index on inner relation (S) 
+        for each tuple in outer relation (R) probe index of inner relation
+
+    - Cost:  B(R) x T(R) x C 
+            where C = T(S)/V(S,A)
+
+
+34) Describe the Sort-merge join algorithm. What is the cost of it? (05_optimization 31.)
+
+     Merge sorted relations :
+        - first pointers point to first record in each relation
+        - then read in a group of records of S with the same values in the join attribute
+        - last read records of R and process
+
+    - Cost = cost of sorting + B(S) + B(R)
+
+35) Describe the Hash-join algorithm? What is the cost of it? (05_optimization 32.)
+
+    1) use h1 on joining attribute to map records to partitions that fit in memory
+        - records of R are partitioned into R0 .. Rn-1
+        - records of S are partitioned into S0 .. Sn-1
+    
+    2) join records in corresponding partitions
+        - using a hash-based indexed block nested loop join
+
+    - Cost = 2 x ( B(S) + B(R) ) + ( B(S) + B(R) )
+
+36) What is materialization and pipelining? (05_optimization 33.)
+
+    - they are the ways that the system can evaluate multiple operations
+
+        Materialization: Create a temporary relation as the output of a stage (and write it to desk), 
+        pass to next stage as input, to evaluate the whole operation
+
+        Pipelining: compute the first record of a stage, and sends the results to the node, and calculate the results.
+        so its a pipeline of operations (not always can be implemented)
+
+37) Give some basic relational algebra expression equivalence rules (05_optimization 39.)
+
+    - conjunctive selection decomposition
+    - commutativity of selection
+    - combining selection with join and product
+    - commutativity of joins
+    - associativity of joins
+    - distribution of selection over join
+    - distribution of projection over join
+
+38) conjunctive selection decomposition (05_optimization 39.)
+39) distribution of selection over join (05_optimization 39.)
+40) distribution of projection over join (05_optimization 39.)
+41) associativity of joins, products, union (05_optimization 39.)
+
+
+42) Give the meaning of the following index options: (05_special_storage 8.) composite index   function-based index     compressed index
+
+
+    - composite index   
+    - function-based index     
+    - compressed index
+
+43) What is a partitioned table? (05_special_storage 11.)
+
+    - a table where Data is divided into smaller, more manageable pieces.
+
+44) List the partitioning types an Oracle database supports (05_special_storage 12-13.)
+
+    - RANGE PARTITION
+    - HASH PARTITION
+    - LIST PARTITION
+    - SUBPARTITIONS (RANGE-HASH)
+
+45) Give the properties of an Index-Organized Table (05_special_storage 16.)
+
+    - Have faster key-based access to table data
+    - Do not duplicate the storage of primary key values
+    - Require less storage 
+    - Use secondary indexes and logical row IDs
+    - Have higher availability because table reorganization 
+    does not invalidate secondary indexes
+
+46) Give a diagram about two clustered tables (05_special_storage 18.) ---------------------
+47) Give estimation for the number of blocks of a product operation: B(R x S) (06_UW_query_proc 47.) -----------
+
+    - W = R X S0
+
+    B(W) = T(R)*T(S)/bf(W) = 
+        = T(R)*T(S)*L(S)/b + T(S)*T(R)*L(R)/b =
+        = T(R)*T(S)/bf(S) + T(S)*T(R)/bf(R) =
+        = T(R)*B(S) + T(S)*B(R)
+
+48) What is Selection Cardinality? (06_UW_query_proc 50.)
+
+    - average # records that satisfy equality condition on R.A
+        SC(R,A) = T(R) / V(R,A)
+
+
+49) Give estimation for the number of rows of a join operation: T(R ⨝ S) (06_UW_query_proc 54.)
+
+    Let x = attributes of R
+    y = attributes of S
+
+    Case 1 : X ^ y = fi 
+        then same as R x S
+    
+    Case 2 : X ^ y = A
+
+        T(W)  =  T(R) x T(S) /  max{ V(R,A), V(S,A) }
+
+
+50) Give estimation for the number of rows of A<=xR (06_UW_query_proc 59.)
+51) Give estimation for the number of rows of Θ1Θ2 … ΘnR (06_UW_query_proc 59.)
+52) Give estimation for the number of rows of Θ1˅Θ2˅  … ˅ΘnR (06_UW_query_proc 59.)
+53) Give the main steps of query optimization (diagram) (06_UW_query_proc 17.)
+54) Give two conventional wisdom rules about query optimization (06_UW_query_proc 41.)
+55) What is the difference between ALL_ROWS and FIRST_ROWS optimization modes? (07_tuning 6.)
+56) What does an EXPLAIN PLAN statement do? (07_tuning 15.)
+57) What is stored in PLAN_TABLE? (07_tuning 15.)
+58) What is a Full Table Scan operation (07_tuning 18.)
+59) What is an Index Unique Scan operation (07_tuning 25.)
+60) What is an Index Range Scan operation (07_tuning 27.)
+61) What is Clustering Factor? (07_tuning 40.)
+62) What is the difference between Explain Plan and Tracing? (07_tuning 69.)
+63) What can we do with hints? (07_tuning 72.)
+64) What can we do with ANALYZE command? (07_tuning 74)
+65) What does it mean: a consistent database? (09_UW_crash_recovery 4.)
+66) What is a transaction? (09_UW_crash_recovery 10.)
+67) How can constraints be violated? (09_UW_crash_recovery 12.)
+68) What are undesired expected events? (09_UW_crash_recovery 15.)
+69) Give the 3 important address spaces of a DBMS. (09_UW_crash_recovery 18.)
+70) Describe the following operations: read, write, input, output. (09_UW_crash_recovery 20.)
+71) What does “atomicity” property of a transaction mean? (09_UW_crash_recovery 27.)
+72) Describe UNDO logging rules. (09_UW_crash_recovery 38.)
+73) Give the write order to disk in case of UNDO logging (09_UW_crash_recovery 39.)
+74) Give the recovery rules in case of UNDO logging. (09_UW_crash_recovery 43.)
+75) Give the UNDO recovery steps if you see the following log records on disk ...
+76) What happens when a failure occurs during recovery from UNDO log? (09_UW_crash_recovery 44.)
+77) Give the steps of a simple checkpoint in UNDO logging. (09_UW_crash_recovery 50.)
+78) Give the steps of a non-quiescent checkpoint in UNDO logging. (09_UW_crash_recovery 51.)
+79) To which point do we have to scan backwards in UNDO log if we use checkpoint? (09_UW_crash_recovery 53.)
+80) Describe REDO logging rules. (09_UW_crash_recovery 59.)
+81) Give the write order to disk in case of REDO logging (09_UW_crash_recovery 60.)
+82) Give the recovery rules in case of REDO logging. (09_UW_crash_recovery 64.)
+83) Give the REDO recovery steps if you see the following log records on disk ...
+84) Give the steps of a non-quiescent checkpoint in REDO logging. (09_UW_crash_recovery 67.)
+85) To which point do we have to scan backwards in REDO log if we use checkpoint? (09_UW_crash_recovery 69.)
+86) What are the key drawbacks of UNDO log and REDO log? (70.)
+87) Describe UNDO/REDO logging rules. (09_UW_crash_recovery 72.)
+88) Give the recovery rules in case of UNDO/REDO logging. (09_UW_crash_recovery 73.)
+89) Give the steps of a non-quiescent checkpoint in UNDO/REDO logging. (09_UW_crash_recovery 75.)
+90) What is concurrency control (10_UW_concurrency 3.)
+91) What is a schedule? (10_UW_concurrency 6., 14.)
+92) What is a serial schedule? (10_UW_concurrency 6.)
+93) What is a serializable schedule? (10_UW_concurrency 9.)
+94) What does it mean: "conflict equivalent"? (10_UW_concurrency 23.)
+95) What does it mean: "conflict serializable"? (10_UW_concurrency 23.)
+96) What is a precedence graph? (10_UW_concurrency 26.)
+97) What can we say if two schedules are conflict equivalent? (10_UW_concurrency 29.)
+98) Give two schedules whose precedence graphs are the same, but not confl. equivalent. (10_UW_concurrency 31.)
+99) Construct the precedence graph for the following schedule ...
+100) What can we state about precedence graphs? (10_UW_concurrency 32.)
+101) What does "consistency of a transaction" mean? (10_UW_concurrency 37.)
+102) What does "legality of schedules" mean? (10_UW_concurrency 38.)
+103) What does "two phase locking" mean? (10_UW_concurrency 42.)
+104) What is a deadlock? How can we detect it? (10_UW_concurrency 51-54.)
+105) What can we state about legal schedules of consistent 2PL transactions? (10_UW_concurrency 50.)
+106) Give a serializable schedule which cannot be achieved via 2PL (10_UW_concurrency 58.)
+107) What does "consistency of a transaction" mean in case of shared/exclusive locks? (10_UW_concurrency 63.)
+108) What is legality of schedules in case of shared/exclusive locks? (10_UW_concurrency 64.)
+109) What is the compatibility matrix? Give it for the shared/exclusive locking system. (10_UW_concurrency 68.)
+110) Give the compatibility matrix for shared/exclusive/increment locking system. (10_UW_concurrency 74.)
+111) Give the compatibility matrix for shared/exclusive/update locking system. (10_UW_concurrency 77.)
+112) How DBMS-es guarantee 2PL in practice? (10_UW_concurrency 80.)
+113) What information can we find in Lock Tables of a DBMS? (10_UW_concurrency 82-84.)
+114) What is the advantage/disadvantage of locking large objects? (10_UW_concurrency 87.)
+115) What is the advantage/disadvantage of locking small objects? (10_UW_concurrency 87.)

@@ -1,0 +1,109 @@
+A ... index is an index on multiple columns in a table.
+✔️ composite
+RAID level ... means block level striping with dedicated parity disk.
+✔️4
+A database ... is the combination of the system global area (SGA) and background processes.
+✔️instance
+When tables are ... , a single data block can contain rows from multiple tables.
+✔️clustered
+A ... index is always dense.
+✔️secondary
+RAID level ... means block level striping and distributed parity disk.
+✔️5
+A ... is useful for hiding the identity and location of an underlying schema object.
+✔️synonym
+An ... is a set of logically contiguous data blocks.
+✔️extent
+A ... index is an index that has been divided into smaller and more manageable pieces.
+✔️partitioned
+RAID level ... means mirroring and no striping.
+✔️1
+In case of a ... index, data records are not sorted by the search key.
+✔️secondary
+... is the column or columns that the clustered tables have in common.
+✔️cluster key
+A ... requires no storage other than the storage of its query in the data dictionary.
+✔️view
+... is a set of files containing records of changes made to data files.
+✔️online redo log
+... makes it possible to decompose very large tables and indexes into smaller and more manageable pieces.
+✔️partitioning
+A ... is a physical file on disk that contains data structures such as tables and indexes.
+✔️data file
+The database data files are logically grouped together in a ...
+✔️tablespace(s)
+... tablespace is a tablespace that can only contain transient data that persists only for the duration of a session.
+✔️temporary
+A ... index has an index entry for every search key value.
+✔️dense
+If you create a ... table, then no table segment is allocated for this table.
+✔️partitioned
+A ... device "forgets" what is stored in it when the power goes off.
+✔️volatile
+... is a file that provides a chronological log of database messages and errors.
+✔️alert log
+... contains information about the name and location of data files, online redo log files etc.
+✔️control file
+... is a situation in which two or more users are waiting for data locked by each other.
+✔️deadlock
+A ... is a schema object from which multiple users can generate unique integers.
+✔️sequence
+A ... file means that we sort the tuples of a relation by their primary key and store them in data blocks in this order.
+✔️sequential
+... is the time while the first sector of the block moves under the head.
+✔️rotational latency
+All data dictionary tables and views are stored in the ... tablespace.
+✔️SYSTEM
+A ... index determines the location of the records of the data file.
+✔️primary
+In composite partitioning each partition is further divided into ...
+✔️subpartition
+... is characterized by higher read/write times than secondary storage.
+✔️tertiary storage
+A ... is a group of tables that share common columns and store related data in the same blocks.
+✔️table cluster
+... SQL is SQL whose complete text is not known until run time.
+✔️Dynamic
+A ...  is a data file that belongs to a temporary tablespace.
+✔️temp file
+A ... index physically reverses the bytes of each index key while keeping the column order.
+✔️reverse key
+A ... is a piece of a very large table or index.
+✔️A partition
+A ... is an instruction passed to the optimizer through comments in an SQL statement.
+✔️hint
+A ... caches currently and recently used data blocks read from disk.
+✔️buffer
+The Oracle Database user ... owns all base tables and user-accessable views of the data dictionary.same
+✔️sys
+A ... table is a table in which the data rows are stored in no particular order on disk.
+✔️heap-organized
+A ... index has index entries for only some of the search values, typically one entry per block.
+✔️sparse
+A ... is a set of extents allocated for a specific database object, such as atable.
+✔️segment
+A database ... is a logical storage structure whose size and structure are not known to the operating system.
+✔️data block
+RAID level ... means block level striping and no redundancy.
+✔️0
+RAID level ... means block level striping and two distributed parity disks.
+✔️6
+A ... index is an index that computes the value of a function or expression involving one or more columns and stores it in the index.
+✔️function-based
+... is the time while the disk controller positions the head assembly at the proper cylinder
+✔️seek time
+In a ... index, the second and higher levels must be sparse.
+✔️multi-level
+... table is a table whose data are stored in primary key order.
+✔️index-organized table
+A database data block consists of one or more ...
+✔️disk block
+
+
+
+------------------------------------------------------------------------------------------------------------------------------------
+All secondary and tertiary storage devices are ... devices.
+nonvolatile ???
+
+The basic strategies for partitioning are the following in alphabetical order: ...
+hash,list,range, SUBPARTITIONS (RANGE-HASH) ???

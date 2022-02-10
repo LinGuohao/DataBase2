@@ -1,0 +1,75 @@
+1. (6 points)
+Insert the following keys (in the given order) into the B+ tree below: 53, 22, 92 
+Let's suppose that a node (block) can contain 3 keys and 4 pointers.
+Redraw the tree after each split.
+
+                           70
+                41|56                 78
+   16|31|35   41|44|52   56|68    70|74   78|81|87  
+   
+------------------------------------------------------------------------
+Solution:
+
+                           70
+                41|56                 78
+   16|31|35   41|44|52   56|68    70|74   78|81|87 
+
+Insert: 53
+
+                           70
+              41|52|56                 78
+   16|31|35   41|44		52|53   56|68    70|74   78|81|87
+
+Insert: 22
+
+                           52|70
+              31|41			56                 78
+   16|22	31|35   41|44		52|53   56|68    70|74   78|8187 
+
+Insert: 92
+
+                           52|70
+              31|41			56                 78|87
+   16|22	31|35   41|44		52|53   56|68    70|74   78|81		87|92     
+========================================================================
+
+2. (6 points)
+a) Compress the following bit vector with run-length encoding:
+   100000000000000010000000000011
+
+b) Decompress the following run-length encoded bit vector:
+   111011101010110110
+------------------------------------------------------------------------
+Solution:
+
+2. a) 111011111110101100
+b) 0000000000000010010000001
+========================================================================
+4. (10 points)
+Let's consider a relation R with the following parameters:
+T(R)=1600000, block size = 8192 bytes, L(R)=256 bytes, V(R,A)=250, and let W the result
+of the following query: W <-- SELECT c1,c2 FROM R WHERE A='x';
+a) Compute B(W) if L(W)=64 bytes.
+b) What is the cost (in block I/O) of a sort operation on R, if the memory size is 101 blocks?
+------------------------------------------------------------------------
+Solution:
+a)
+-> compute bf(W) and T(W), then B(W) = T(W)/bf(W)
+bf(R) = (block size)/L(R) = 32, bf(W) = (block size)/L(W) = 128; T(W) = T(R)/V(R,A) = 6400
+B(R) = T(R)/bf(R) = 1600000/32 =~ 50000
+B(W) = T(W)/bf(W) = 2000/64    = 50
+
+b)
+-> 2*B(R) + 2*B(R)*log[B(R)/M] - B(R)  (base of logarithm is M-1)
+-> Cost =~ 100000 + 134730 - 50000
+========================================================================
+
+5. (10 points)
+Give the name and size of the BITMAP indexes whose owner is ’NIKOVITS’ (Index_name, Size)
+------------------------------------------------------------------------
+Solution:
+SELECT  i.index_name, s.bytes FROM dba_segments s, dba_indexes i 
+WHERE s.owner='NIKOVITS' AND i.owner=s.owner AND index_name=segment_name 
+AND segment_type like 'INDEX%' AND index_type='BITMAP';
+========================================================================
+
